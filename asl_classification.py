@@ -7,17 +7,13 @@ Original file is located at
     https://colab.research.google.com/drive/1Yp4v0nKdBgfAUBSUKuZqOfbp2MmqdWTj
 """
 
-# Mount google drive to access kaggle.json file
-# from google.colab import drive
-# drive.mount('/content/drive')
-
 # Commented out IPython magic to ensure Python compatibility.
 # %matplotlib inline
 import tensorflow as tf
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
-# import kaggle
+import kaggle
 from skimage import transform # pip install scikit-image
 
 #physical_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -37,14 +33,17 @@ If running this tutorial google colab, follow this link (https://www.analyticsvi
 """
 
 # Code for downloading the dataset directly from Kaggle in Google Colab using unique api key
-# ! pip install -q kaggle # Install kaggle
-# ! mkdir ~/.kaggle # Make a new .kaggle directory
-# #! cp /content/drive/MyDrive/kaggle.json ~/.kaggle/ # Accessing kaggle.json api key file from google drive
-# ! echo '{"username":"tysontrail","key":"29decad2f17556a9de6abf9e5b93dc21"}' > ~/.kaggle/kaggle.json #write kaggle API credentials to kaggle.json
-# ! chmod 600 ~/.kaggle # Change the permissions of the file
-# ! mkdir asl_alphabet # Create new directory 
-# ! kaggle datasets download -d grassknoted/asl-alphabet # Download dataset from kaggle
-# ! unzip -q asl-alphabet.zip -d asl_alphabet/ # Unzip and save in newly created directory
+! pip install -q kaggle # Install kaggle
+! mkdir ~/.kaggle # Make a new .kaggle directory
+! echo '{"username":"tysontrail","key":"29decad2f17556a9de6abf9e5b93dc21"}' > ~/.kaggle/kaggle.json #write kaggle API credentials to kaggle.json
+! chmod 600 ~/.kaggle # Change the permissions of the file
+! mkdir asl_alphabet # Create new directory 
+
+# uncomment for larger dataset
+! kaggle datasets download -d grassknoted/asl-alphabet # Download dataset from kaggle
+! unzip -q asl-alphabet.zip -d asl_alphabet/ # Unzip and save in newly created directory
+
+# uncomment for smaller dataset
 # ! kaggle datasets download -d danrasband/asl-alphabet-test # Download dataset from kaggle
 # ! unzip -q asl-alphabet-test.zip -d asl_alphabet/ # Unzip and save in newly created directory
 # ! rm -r asl_alphabet/asl-alphabet-test # Remove additional unneccessary duplicate library
