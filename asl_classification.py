@@ -8,8 +8,8 @@ Original file is located at
 """
 
 # Mount google drive to access kaggle.json file
-from google.colab import drive
-drive.mount('/content/drive')
+# from google.colab import drive
+# drive.mount('/content/drive')
 
 # Commented out IPython magic to ensure Python compatibility.
 # %matplotlib inline
@@ -37,20 +37,23 @@ If running this tutorial google colab, follow this link (https://www.analyticsvi
 """
 
 # Code for downloading the dataset directly from Kaggle in Google Colab using unique api key
-! pip install -q kaggle # Install kaggle
-! mkdir ~/.kaggle # Make a new .kaggle directory
-#! cp /content/drive/MyDrive/kaggle.json ~/.kaggle/ # Accessing kaggle.json api key file from google drive
-! echo '{"username":"tysontrail","key":"29decad2f17556a9de6abf9e5b93dc21"}' > ~/.kaggle/kaggle.json #write kaggle API credentials to kaggle.json
-! chmod 600 ~/.kaggle # Change the permissions of the file
-! mkdir asl_alphabet # Create new directory 
-! kaggle datasets download -d grassknoted/asl-alphabet # Download dataset from kaggle
-! unzip -q asl-alphabet.zip -d asl_alphabet/ # Unzip and save in newly created directory
+# ! pip install -q kaggle # Install kaggle
+# ! mkdir ~/.kaggle # Make a new .kaggle directory
+# #! cp /content/drive/MyDrive/kaggle.json ~/.kaggle/ # Accessing kaggle.json api key file from google drive
+# ! echo '{"username":"tysontrail","key":"29decad2f17556a9de6abf9e5b93dc21"}' > ~/.kaggle/kaggle.json #write kaggle API credentials to kaggle.json
+# ! chmod 600 ~/.kaggle # Change the permissions of the file
+# ! mkdir asl_alphabet # Create new directory 
+# ! kaggle datasets download -d grassknoted/asl-alphabet # Download dataset from kaggle
+# ! unzip -q asl-alphabet.zip -d asl_alphabet/ # Unzip and save in newly created directory
 # ! kaggle datasets download -d danrasband/asl-alphabet-test # Download dataset from kaggle
 # ! unzip -q asl-alphabet-test.zip -d asl_alphabet/ # Unzip and save in newly created directory
 # ! rm -r asl_alphabet/asl-alphabet-test # Remove additional unneccessary duplicate library
 
 # Create class names
 class_names = ["A", "B", "C", "D", "E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","del","nothing","space"]
+
+# Specify image output folder
+IMG_OUT = "./output_images/"
 
 # Save images as array 
 # images = np.asarray(glob.glob("asl_alphabet/asl_alphabet_train/asl_alphabet_train" + "/*/*.jpg"))
@@ -87,7 +90,9 @@ for (ii,jj) in enumerate(sample_indexes):
     plt.subplot(5,6,ii+1)
     plt.imshow(X[jj], cmap = "gray")
     plt.title("Label: %s" %class_names[int(Y[jj])])
-plt.show()
+plt.savefig(IMG_OUT + "dev_set_samples.png")
+plt.close()
+# plt.show()
 
 #The number of classes across samples looks balanced
 # Let's shuffle the samples and split them
@@ -186,7 +191,9 @@ for ii in range(batch_size):
     plt.subplot(7,5,ii+1)
     plt.imshow((Xbatch[ii]- Xbatch[ii].min())/(Xbatch.max() - Xbatch[ii].min()), cmap = "gray")
     plt.title("Label: %s" %class_names[int(Ybatch[ii].argmax())])
-plt.show()
+# plt.show()
+plt.savefig(IMG_OUT + "augmented_set.png")
+plt.close()
 
 """## 6. Transfer Learning
 6.1 Choose and load your pretrained model without the top (i.e., the prediction part, usually the fully connected layers)
@@ -244,7 +251,9 @@ for (ii,jj) in enumerate(sample_indexes_right):
     aux = (aux - aux.min())/(aux.max() - aux.min())
     plt.imshow(aux, cmap = "gray")
     plt.title("Label: %d, predicted: %d" %(Y_test[right_indexes[jj]],Ypred[right_indexes[jj]]))
-plt.show()
+# plt.show()
+plt.savefig(IMG_OUT + "correctly_labelled.png")
+plt.close()
 
 #Investigating incorrect labelling
 wrong_indexes = np.where(Ypred != Y_test)[0]
@@ -258,5 +267,7 @@ for (ii,jj) in enumerate(sample_indexes):
     aux = (aux - aux.min())/(aux.max() - aux.min())
     plt.imshow(aux, cmap = "gray")
     plt.title("Label: %d, predicted: %d" %(Y_test[wrong_indexes[jj]],Ypred[wrong_indexes[jj]]))
-plt.show()
+# plt.show()
+plt.savefig(IMG_OUT + "incorrectly_labelled.png")
+plt.close()
 
