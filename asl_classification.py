@@ -33,20 +33,23 @@ If running this tutorial google colab, follow this link (https://www.analyticsvi
 """
 
 # Code for downloading the dataset directly from Kaggle in Google Colab using unique api key
-! pip install -q kaggle # Install kaggle
-! mkdir ~/.kaggle # Make a new .kaggle directory
-! echo '{"username":"tysontrail","key":"29decad2f17556a9de6abf9e5b93dc21"}' > ~/.kaggle/kaggle.json #write kaggle API credentials to kaggle.json
-! chmod 600 ~/.kaggle # Change the permissions of the file
-! mkdir asl_alphabet # Create new directory 
+# ! pip install -q kaggle # Install kaggle
+# ! mkdir ~/.kaggle # Make a new .kaggle directory
+# ! echo '{"username":"tysontrail","key":"29decad2f17556a9de6abf9e5b93dc21"}' > ~/.kaggle/kaggle.json #write kaggle API credentials to kaggle.json
+# ! chmod 600 ~/.kaggle # Change the permissions of the file
+# ! mkdir asl_alphabet # Create new directory 
 
+
+# --- this it taken care of in the slurm file-----------------------------------------------------
 # uncomment for larger dataset
-! kaggle datasets download -d grassknoted/asl-alphabet # Download dataset from kaggle
-! unzip -q asl-alphabet.zip -d asl_alphabet/ # Unzip and save in newly created directory
+# ! kaggle datasets download -d grassknoted/asl-alphabet # Download dataset from kaggle
+# ! unzip -q asl-alphabet.zip -d asl_alphabet/ # Unzip and save in newly created directory
 
 # uncomment for smaller dataset
 # ! kaggle datasets download -d danrasband/asl-alphabet-test # Download dataset from kaggle
 # ! unzip -q asl-alphabet-test.zip -d asl_alphabet/ # Unzip and save in newly created directory
 # ! rm -r asl_alphabet/asl-alphabet-test # Remove additional unneccessary duplicate library
+# --------------------------------------------------------------------------------------
 
 # Create class names
 class_names = ["A", "B", "C", "D", "E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","del","nothing","space"]

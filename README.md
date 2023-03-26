@@ -70,6 +70,11 @@ You can check if your files have been uploaded by running `ls` in your talc term
 !!! Important
 
 You should copy the .slurm out of the `enel645_final` folder into your home directory by running this in your talc terminal: `cp ~/enel645_final/run_asl_classifier.slurm ~run_asl_classifier.slurm`
+You should also verify that you have an `als` conda environment in your TALC. If you don't, you get an error. Here's how you install it:
+
+1. Verify anaconda is loaded by running `module load python/anaconda3-2018.12`
+2. Check what environments you have with `conda info --envs`
+3. If you only have the base environment, create the als environment: `conda create -n asl python=3.9` and hit yes to continue - this takes about 15 minutes to load and install everything.
 
 ## Part 3: run the batch job
 In your terminal, run `sbatch run_asl_classifier.slurm` - you can check if its working by typing `squeue`. All of the python outputs are saved to a `*.out` file in your enel645_final directory in TALC. 
