@@ -7,14 +7,19 @@ Original file is located at
     https://colab.research.google.com/drive/1Yp4v0nKdBgfAUBSUKuZqOfbp2MmqdWTj
 """
 
+# # Mount google drive to access kaggle.json file
+# from google.colab import drive
+# drive.mount('/content/drive')
+
 # Commented out IPython magic to ensure Python compatibility.
 # %matplotlib inline
 import tensorflow as tf
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
-import kaggle
+# import kaggle
 from skimage import transform # pip install scikit-image
+import os
 
 #physical_devices = tf.config.experimental.list_physical_devices('GPU')
 #tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -35,36 +40,75 @@ If running this tutorial google colab, follow this link (https://www.analyticsvi
 # Code for downloading the dataset directly from Kaggle in Google Colab using unique api key
 # ! pip install -q kaggle # Install kaggle
 # ! mkdir ~/.kaggle # Make a new .kaggle directory
+# #! cp /content/drive/MyDrive/kaggle.json ~/.kaggle/ # Accessing kaggle.json api key file from google drive
 # ! echo '{"username":"tysontrail","key":"29decad2f17556a9de6abf9e5b93dc21"}' > ~/.kaggle/kaggle.json #write kaggle API credentials to kaggle.json
 # ! chmod 600 ~/.kaggle # Change the permissions of the file
 # ! mkdir asl_alphabet # Create new directory 
 
-
-# --- this it taken care of in the slurm file-----------------------------------------------------
-# uncomment for larger dataset
+# # Code for downloading larger dataset
 # ! kaggle datasets download -d grassknoted/asl-alphabet # Download dataset from kaggle
 # ! unzip -q asl-alphabet.zip -d asl_alphabet/ # Unzip and save in newly created directory
 
-# uncomment for smaller dataset
+# Code for downloading smaller dataset
 # ! kaggle datasets download -d danrasband/asl-alphabet-test # Download dataset from kaggle
 # ! unzip -q asl-alphabet-test.zip -d asl_alphabet/ # Unzip and save in newly created directory
 # ! rm -r asl_alphabet/asl-alphabet-test # Remove additional unneccessary duplicate library
-# --------------------------------------------------------------------------------------
 
 # Create class names
 class_names = ["A", "B", "C", "D", "E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","del","nothing","space"]
 
-# Specify image output folder
-IMG_OUT = "./output_images/"
-
 # Save images as array 
+
+# Code for FULL larger dataset
 # images = np.asarray(glob.glob("asl_alphabet/asl_alphabet_train/asl_alphabet_train" + "/*/*.jpg"))
-images = np.asarray(glob.glob("asl_alphabet/asl_alphabet_train/asl_alphabet_train" + "/*/*.jpg"))
+
+# Code for smaller dataset
+# images = np.asarray(glob.glob("asl_alphabet/" + "/*/*.jpg"))
+# print(images.shape)
+
+# Set the path to the image folder
+image_folder_path = "/home/vladyslav.timofyeyev/asl_alphabet"
+IMG_OUT = "/home/vladyslav.timofyeyev/output_images/"
+
+# Set the total number of images for training (Maximum 87000 from dataset)
+total_images = 87000
+
+# Sets the distribution of each label
+distribution = total_images/29
+
+# Get a list of all image file paths
+image_file_paths = np.asarray(glob.glob(os.path.join(image_folder_path, "*", "*.jpg")))
+
+# Count the number of files for each label
+file_counts = {}
+for path in image_file_paths:
+    label = os.path.basename(os.path.dirname(path))
+    file_counts[label] = file_counts.get(label, 0) + 1
+
+print(file_counts)
+
+# Create a list to hold the selected image file paths
+selected_image_file_paths = []
+
+# Iterate over each letter label
+for label in file_counts.keys():
+    # Get the image file paths for the current letter label
+    image_file_paths_for_letter = [path for path in image_file_paths if os.path.basename(os.path.dirname(path)) == label]
+    
+    # Shuffle the list of image file paths for the current letter label
+    np.random.shuffle(image_file_paths_for_letter)
+    
+    # Add the first n image file paths for the current letter label to the list
+    n = int(min(distribution, file_counts[label]))
+    selected_image_file_paths.extend(image_file_paths_for_letter[:n])
+
+# Convert list to array
+images = np.asarray(selected_image_file_paths)
 
 # Save labels as array
-labels = np.asarray([f.split("/")[-2] for f in images])
+labels = np.asarray([f.split("/")[-2] for f in selected_image_file_paths])
 
-print(len(images))
+print(images.shape)
 print(images[:50])
 print(labels[:50])
 
@@ -77,6 +121,7 @@ for ii in range(len(class_names)):
 img_height = 224
 img_width = 224
 
+# Attempting at trying to optimize runtime/python loop
 # X = np.empty((len(images), img_height, img_width, 3))
 # X[:] = [np.resize(plt.imread(img), (img_height, img_width, 3)) for img in images]
 
@@ -92,11 +137,8 @@ for (ii,jj) in enumerate(sample_indexes):
     plt.subplot(5,6,ii+1)
     plt.imshow(X[jj], cmap = "gray")
     plt.title("Label: %s" %class_names[int(Y[jj])])
-plt.savefig(IMG_OUT + "dev_set_samples.png")
-plt.close()
-# plt.show()
+plt.savefig(IMG_OUT + " ")
 
-#The number of classes across samples looks balanced
 # Let's shuffle the samples and split them
 indexes = np.arange(X.shape[0], dtype = int)
 np.random.shuffle(indexes)
@@ -108,7 +150,8 @@ Y = Y[indexes]
 
 # Train/validation/test split
 nsplit1 = int(0.75*X.shape[0]) 
-nsplit2 = int(0.9*X.shape[0]) 
+nsplit2 = int(0.9*X.shape[0])
+ 
 # Train and validation split
 
 X_train = X[:nsplit1]
@@ -119,6 +162,42 @@ Y_val = Y[nsplit1:nsplit2]
 
 X_test = X[nsplit2:]
 Y_test = Y[nsplit2:]
+
+print("\nTrain set")
+print("Images: ",X_train.shape)
+print("Labels shape: ",Y_train.shape)
+
+print("\nValidation set")
+print("Images: ",X_val.shape)
+print("Labels shape: ",Y_val.shape)
+
+print("\nTest set")
+print("Images: ",X_test.shape)
+print("Labels shape: ",Y_test.shape)
+
+from sklearn.model_selection import train_test_split
+
+# Batch size
+batch_size = 32
+
+# Split the data into batches
+n_batches = X.shape[0] // batch_size
+X_batches = np.array_split(X[:n_batches*batch_size, ...], n_batches)
+Y_batches = np.array_split(Y[:n_batches*batch_size], n_batches)
+
+# Shuffle the order of the batches
+batch_indexes = np.arange(n_batches)
+np.random.shuffle(batch_indexes)
+
+# Concatenate the shuffled batches into shuffled X and Y arrays
+X_shuffled = np.concatenate([X_batches[i] for i in batch_indexes], axis=0)
+Y_shuffled = np.concatenate([Y_batches[i] for i in batch_indexes], axis=0)
+
+# Split the shuffled data into train and test sets
+X_train, X_test, Y_train, Y_test = train_test_split(X_shuffled, Y_shuffled, test_size=0.1)
+
+# Split the train data into train and validation sets
+X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.15)
 
 print("\nTrain set")
 print("Images: ",X_train.shape)
@@ -171,8 +250,10 @@ lr_schedule = tf.keras.callbacks.LearningRateScheduler(scheduler,verbose = 0)
 """## 5. Keras Data Augmentation"""
 
 batch_size = 32
+
+# Default rotation_range = 0
 gen_params = {"featurewise_center":False,"samplewise_center":False,"featurewise_std_normalization":False,\
-              "samplewise_std_normalization":False,"zca_whitening":False,"rotation_range":20,"width_shift_range":0.1,"height_shift_range":0.1,\
+              "samplewise_std_normalization":False,"zca_whitening":False,"width_shift_range":0.1,"height_shift_range":0.1,\
               "shear_range":0.2, "zoom_range":0.1,"horizontal_flip":True,"fill_mode":'constant',\
                "cval": 0}
 train_gen = tf.keras.preprocessing.image.ImageDataGenerator(**gen_params, preprocessing_function = tf.keras.applications.mobilenet.preprocess_input)
@@ -193,8 +274,7 @@ for ii in range(batch_size):
     plt.subplot(7,5,ii+1)
     plt.imshow((Xbatch[ii]- Xbatch[ii].min())/(Xbatch.max() - Xbatch[ii].min()), cmap = "gray")
     plt.title("Label: %s" %class_names[int(Ybatch[ii].argmax())])
-# plt.show()
-plt.savefig(IMG_OUT + "augmented_set.png")
+plt.savefig(IMG_OUT + "dev_set_samples.png")
 plt.close()
 
 """## 6. Transfer Learning
@@ -253,7 +333,6 @@ for (ii,jj) in enumerate(sample_indexes_right):
     aux = (aux - aux.min())/(aux.max() - aux.min())
     plt.imshow(aux, cmap = "gray")
     plt.title("Label: %d, predicted: %d" %(Y_test[right_indexes[jj]],Ypred[right_indexes[jj]]))
-# plt.show()
 plt.savefig(IMG_OUT + "correctly_labelled.png")
 plt.close()
 
@@ -269,7 +348,6 @@ for (ii,jj) in enumerate(sample_indexes):
     aux = (aux - aux.min())/(aux.max() - aux.min())
     plt.imshow(aux, cmap = "gray")
     plt.title("Label: %d, predicted: %d" %(Y_test[wrong_indexes[jj]],Ypred[wrong_indexes[jj]]))
-# plt.show()
 plt.savefig(IMG_OUT + "incorrectly_labelled.png")
 plt.close()
 
