@@ -148,6 +148,7 @@ while True:
         hand_counter = 0
 
     cv2.imshow("Video", frame)
+    cv2.imwrite("image.png", frame)
 
-video_capture.release()
-cv2.destroyAllWindows()
+# video_capture.release()
+# cv2.destroyAllWindows()
