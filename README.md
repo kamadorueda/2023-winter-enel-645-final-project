@@ -6,4 +6,4 @@
 
 This is how our detection system looks like:
 
-![](./prediction-c.png)
+![](./imgs/prediction-c.png)
