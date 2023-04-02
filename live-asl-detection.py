@@ -44,7 +44,7 @@ class_names = [
 ]
 
 # Recreate the exact same model, including its weights and the optimizer
-asl_model = tf.keras.models.load_model("training_classifier_asl.h5")
+asl_model = tf.keras.models.load_model("asl-model.h5")
 
 # Show the model architecture
 asl_model.summary()
@@ -87,7 +87,7 @@ while True:
             y_max = min(height, y_max + 20)
             x_min = max(0, x_min - 20)
             x_max = min(width, x_max + 20)
-            
+
             cv2.rectangle(
                 frame, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2
             )
