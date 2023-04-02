@@ -83,10 +83,11 @@ while True:
                 y_min = min(y_min, y)
                 y_max = max(y_max, y)
 
-            y_min -= 20
-            y_max += 20
-            x_min -= 20
-            x_max += 20
+            y_min = max(0, y_min - 20)
+            y_max = min(height, y_max + 20)
+            x_min = max(0, x_min - 20)
+            x_max = min(width, x_max + 20)
+            
             cv2.rectangle(
                 frame, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2
             )
