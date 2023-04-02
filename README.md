@@ -8,3 +8,5 @@
    This is how our detection system looks like:
 
    ![](./imgs/prediction-c.png)
+
+1. Enjoy!
