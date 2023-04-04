@@ -1,5 +1,6 @@
 # ENEL645 Final Project - live American Sign Language detection system
 
+1. The report is [report.pdf](./report.pdf).
 1. The main notebook is [asl-model.ipynb](./asl-model.ipynb).
 1. The fully trained model is [asl-model.h5](./asl-model.h5).
 1. The testing of the model is [asl-model-testing.ipynb](./asl-model-testing.ipynb)
